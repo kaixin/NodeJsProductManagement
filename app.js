@@ -2,6 +2,7 @@ var express = require('express');
 var http = require('http');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var md5 = require('md5-node');
 
 var MongoClient = require('mongodb').MongoClient;
 var dbURL = "mongodb://127.0.0.1:27017";
@@ -58,14 +59,16 @@ app.post('/doLogin', function(req, res) {
       console.log('连接数据库失败');
     }
 
-    var result = db.collection("user").find(req.body);
+    var username = req.body.username;
+    var password = md5(req.body.password);
+    var result = db.collection("user").find({username: username, password: password});
     result.toArray(function(err, data) {
       if(data.length > 0) {
         console.log('登陆成功');
 
         req.session.userinfo = data[0];
         app.locals['userinfo'] = data[0]; //ejs中设置全局数据，所有页面都可以使用
-        
+
         res.redirect('/product');
       }else {
         console.log('登陆失败');
@@ -76,7 +79,23 @@ app.post('/doLogin', function(req, res) {
 });
 
 app.get('/product', function(req,res) {
-  res.render('index');
+  MongoClient.connect(dbURL, function(err, client) {
+    if(err) {
+      console.log('连接数据库失败');
+    }else {
+      var db = client.db(dbName);
+      var result = db.collection('product').find();
+      result.toArray(function(err, data) {
+        if(err) {
+          console.log('获取商品列表失败');
+        }else {
+          res.render('index', {
+            list: data
+          });
+        }
+      });
+    }
+  });
 });
 
 app.get('/productAdd', function(req,res) {
