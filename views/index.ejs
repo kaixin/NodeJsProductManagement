@@ -50,12 +50,14 @@
                     <% for(var i=0; i<list.length; i++) { %>
                     <tr>
                         <td><%=i%></td>
-                        <td>图标</td>
-                        <td><%=list[i].name%></td>
+                        <td><img src="<%=list[i].pic%>" alt="" width="100px"></td>
+                        <td><%=list[i].title%></td>
                         <td><%=list[i].price%>元</td>
                         <td><%=list[i].fee%>元</td>
                       
-                        <td class="text-center">修改  删除</td>
+                        <td class="text-center">
+                          <a href="/productUpdate?id=<%=list[i]._id%>">修改</a>
+                          <a href="/productDelete?id=<%=list[i]._id%>">删除</td>
                     </tr>
                     <% } %>
                     </tbody>

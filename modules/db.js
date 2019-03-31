@@ -1,6 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var dbURL = "mongodb://127.0.0.1:27017";
-var dbName = "productmanagement"
+var dbName = "productmanagement";
+var ObjectID = require('mongodb').ObjectID;
 
 var __connectDB = function(callback) {
   MongoClient.connect(dbURL, function(err, client) {
@@ -12,6 +13,8 @@ var __connectDB = function(callback) {
     callback(db);
   });
 }
+
+exports.ObjectID = ObjectID;
 
 //查找数据
 exports.find = function(collectionName, json, callback) {
