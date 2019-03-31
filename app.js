@@ -3,10 +3,7 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var md5 = require('md5-node');
-
-var MongoClient = require('mongodb').MongoClient;
-var dbURL = "mongodb://127.0.0.1:27017";
-var dbName = "productmanagement"
+var db = require('./modules/db.js');
 
 var app = new express();
 
@@ -53,48 +50,28 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/doLogin', function(req, res) {
-  MongoClient.connect(dbURL, function(err, client) {
-    var db = client.db(dbName);
-    if(err) {
-      console.log('连接数据库失败');
+  var username = req.body.username;
+  var password = md5(req.body.password);
+  db.find('user', {username: username, password: password}, function(data) {
+    if(data.length > 0) {
+      console.log('登陆成功');
+
+      req.session.userinfo = data[0];
+      app.locals['userinfo'] = data[0]; //ejs中设置全局数据，所有页面都可以使用
+
+      res.redirect('/product');
+    }else {
+      console.log('登陆失败');
+      res.send("<script>alert('登陆失败'); window.location.href='/login'</script>");
     }
-
-    var username = req.body.username;
-    var password = md5(req.body.password);
-    var result = db.collection("user").find({username: username, password: password});
-    result.toArray(function(err, data) {
-      if(data.length > 0) {
-        console.log('登陆成功');
-
-        req.session.userinfo = data[0];
-        app.locals['userinfo'] = data[0]; //ejs中设置全局数据，所有页面都可以使用
-
-        res.redirect('/product');
-      }else {
-        console.log('登陆失败');
-        res.send("<script>alert('登陆失败'); window.location.href='/login'</script>");
-      }
-    });
   });
 });
 
 app.get('/product', function(req,res) {
-  MongoClient.connect(dbURL, function(err, client) {
-    if(err) {
-      console.log('连接数据库失败');
-    }else {
-      var db = client.db(dbName);
-      var result = db.collection('product').find();
-      result.toArray(function(err, data) {
-        if(err) {
-          console.log('获取商品列表失败');
-        }else {
-          res.render('index', {
-            list: data
-          });
-        }
-      });
-    }
+  db.find('product', {}, function(data) {
+    res.render('index', {
+      list: data
+    });
   });
 });
 
