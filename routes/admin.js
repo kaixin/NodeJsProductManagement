@@ -5,6 +5,22 @@ var login = require('./admin/login.js');
 var product = require('./admin/product.js');
 var user = require('./admin/user.js');
 
+//验证登陆
+router.use(function(req, res, next) {
+  if(req.url === '/login' || req.url === '/login/doLogin') {
+    next();
+  }else {
+    if(req.session.userinfo && req.session.userinfo.username !== '') {
+      //app.locals //全局
+      //req.app.locals //请求的全局
+      req.app.locals['userinfo'] = req.session.userinfo;
+      next();
+    }else {
+      res.redirect('/admin/login');
+    }
+  }
+});
+
 router.use('/login', login);
 router.use('/product', product);
 router.use('/user', user);

@@ -7,7 +7,7 @@
 <body>
 <!--The content below is only a placeholder and can be replaced.-->
 
-<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
 <nav class="navbar navbar-inverse" role="navigation">
   <div class="container-fluid">
       <div class="navbar-header">
@@ -24,7 +24,8 @@
               </li>  
           </ul>
           <ul class="nav navbar-nav navbar-right">
-              <li><a href="/loginOut">安全退出</a>
+            <li><a>欢迎你 <%=userinfo.username%></a></li>
+              <li><a href="/admin/login/loginOut">安全退出</a>
               </li>
           </ul>
       </div>
